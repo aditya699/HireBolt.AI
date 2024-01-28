@@ -33,7 +33,7 @@ def get_phone_number(filepath: str) -> str:
     
 
         # Modified regex pattern to allow spaces in the phone number
-        pattern = r"\+91\s?\d\s?\d{9} | \+91-d{10}"
+        pattern = r"\+91\s?\d\s?\d{9} | \+91-d{10} | \d{10}"
         
         # Using findall to get all matches in the content
         results = re.findall(pattern, content_info[i])
