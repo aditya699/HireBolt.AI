@@ -1,6 +1,7 @@
 #Import Libraries
 import PyPDF2
 import re
+import os
 from PyPDF2 import PdfReader
 
 key = "6d45ac78cd7e4cda97822052bdd170e2"
@@ -9,6 +10,10 @@ endpoint ="https://hirebolt.cognitiveservices.azure.com/"
 from azure.ai.textanalytics import TextAnalyticsClient
 from azure.core.credentials import AzureKeyCredential
 
+def get_file_paths(folder_path):
+    # Get a list of all files in the specified folder
+    file_paths = [os.path.join(folder_path, file) for file in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, file))]
+    return file_paths
 
 def get_text(filepath):
     reader = PdfReader(filepath)
@@ -33,7 +38,7 @@ def get_phone_number(filepath: str) -> str:
     
 
         # Modified regex pattern to allow spaces in the phone number
-        pattern = r"\+91\s?\d\s?\d{9} | \+91-d{10} | \d{10}"
+        pattern = r"\+91\s?\d\s?\d{9}|\+91-\d{10}|\d{10}|\(\+91\)\s?\d{3}\s?\d{3}\s?\d{4}"
         
         # Using findall to get all matches in the content
         results = re.findall(pattern, content_info[i])
@@ -84,5 +89,7 @@ def sample_abstractive_summarization(document) :
         if result.kind == "AbstractiveSummarization":
             for summary in result.summaries:
                 result_summary.append(summary.text)
+
+
 
     return result_summary
