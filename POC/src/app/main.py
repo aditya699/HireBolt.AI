@@ -1,44 +1,74 @@
-'''
-Author -Aditya Bhatt 8:00 AM 28/01/2023 
-Objective-
-1.Create a application for resume selection
-'''
-filepaths=[]
-
-
-# Specify the folder path
-folder_path = "C:/Users/aditya/Desktop/2024/HireBolt.AI/Data"
-
-
-#Import Modules
-import abc
-from functions import get_phone_number
-from functions import get_email_id
-from functions import sample_abstractive_summarization
-from functions import get_text,get_file_paths
+import streamlit as st
+import re
+from nltk.tokenize import word_tokenize
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 import pandas as pd
-#Call the functions
+from functions import get_phone_number, get_email_id, sample_abstractive_summarization, get_text, get_file_paths
 
-# Get file paths in the folder
-file_paths = get_file_paths(folder_path)
+# Function to clean text
+def clean_text(text):
+    text = text.lower()
+    text = re.sub(r'[^a-z\s]', '', text)
+    return text
 
-# Print the file paths
-for file_path in file_paths:
-    filepaths.append(file_path)
-a=pd.DataFrame()
-for filepath in filepaths:
+# Function to calculate cosine similarity
+def calculate_similarity(query_vector, document_matrix):
+    cosine_similarities = cosine_similarity(query_vector, document_matrix)
+    return cosine_similarities.flatten()
 
-    phone_number=get_phone_number(filepath)
-    email_id=get_email_id(filepath)
-    text=get_text(filepath)
-    summary=sample_abstractive_summarization(document=text)
-    # print(summary)
-    # print(phone_number)
-    # print(email_id)
-    a=a.append({'phone_number':[phone_number],'email_id':[email_id],'summary':[summary]},ignore_index=True)
-    a.to_csv("Appliciants.csv")
-# print(a.head())
+# Streamlit UI
+def main():
+    st.title("HireBolt.AI")
 
+    # Input fields
+    folder_path = st.text_input("Enter the folder path:")
+    job_description = st.text_area("Enter the job description:")
+    no_of_candidates = st.number_input("Number of candidates to select:", min_value=1, step=1, value=5)
 
+    # Process button
+    if st.button("Process Resumes"):
+        filepaths = []
+        a = pd.DataFrame()
 
+        # Get file paths in the folder
+        file_paths = get_file_paths(folder_path)
+
+        # Process resumes
+        for filepath in file_paths:
+            phone_number = get_phone_number(filepath)
+            email_id = get_email_id(filepath)
+            text = get_text(filepath)
+            summary = sample_abstractive_summarization(document=text)
+            a = a.append({'phone_number': [phone_number], 'email_id': [email_id], 'summary': [summary]}, ignore_index=True)
+        a.to_csv("Candidates.csv")
+        # Clean and preprocess data
+        a=pd.read_csv("Candidates.csv")
+        a.drop("Unnamed: 0", axis=1, inplace=True)
+        a['summary'] = a['summary'].apply(lambda x: x[3:-3] if type(x) is str and len(x) >= 6 else x)
+        a['cleaned_summary'] = a['summary'].apply(clean_text)
+
+        # TF-IDF Vectorization
+        vectorizer = TfidfVectorizer(stop_words='english')
+        tfidf_matrix = vectorizer.fit_transform(a['cleaned_summary'])
+
+        # Define job description
+        cleaned_job_description = clean_text(job_description)
+        job_description_vector = vectorizer.transform([cleaned_job_description])
+
+        # Calculate cosine similarity
+        a['similarity_score'] = calculate_similarity(job_description_vector, tfidf_matrix)
+
+        # Sort the dataframe based on similarity scores
+        df_sorted = a.sort_values(by='similarity_score', ascending=False)
+
+        # Save the selected applicants to a CSV file
+        df_sorted.head(no_of_candidates).to_csv("selected_applicants.csv", index=False)
+
+        # Display selected applicants
+        st.success("Resumes processed successfully!")
+        st.dataframe(df_sorted.head(no_of_candidates))
+
+if __name__ == "__main__":
+    main()
