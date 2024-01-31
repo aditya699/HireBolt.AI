@@ -24,6 +24,7 @@ def main():
 
     # Input fields
     folder_path = st.text_input("Enter the folder path:")
+    folder_path=folder_path.replace('\\','/')
     job_description = st.text_area("Enter the job description:")
     no_of_candidates = st.number_input("Number of candidates to select:", min_value=1, step=1, value=5)
 
@@ -41,7 +42,7 @@ def main():
             email_id = get_email_id(filepath)
             text = get_text(filepath)
             summary = sample_abstractive_summarization(document=text)
-            a = a.append({'phone_number': [phone_number], 'email_id': [email_id], 'summary': [summary]}, ignore_index=True)
+            a = a.append({'phone_number': [phone_number], 'email_id': [email_id], 'summary': [summary],'file_paths':[filepath]}, ignore_index=True)
         a.to_csv("Candidates.csv")
         # Clean and preprocess data
         a=pd.read_csv("Candidates.csv")

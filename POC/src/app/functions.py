@@ -22,7 +22,7 @@ def get_text(filepath):
     
     for i in range(no_of_pages):
         page = reader.pages[i]
-        content_info.append(page.extract_text())
+        content_info.append(page.extract_text().lower())
     
     return content_info
 
