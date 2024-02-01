@@ -3,12 +3,17 @@ import PyPDF2
 import re
 import os
 from PyPDF2 import PdfReader
+from pyresparser import ResumeParser
+import warnings
+
+from azure.core.credentials import AzureKeyCredential
+from azure.ai.textanalytics import (
+        TextAnalyticsClient,
+        ExtractiveSummaryAction
+    ) 
 
 key = "6d45ac78cd7e4cda97822052bdd170e2"
 endpoint ="https://hirebolt.cognitiveservices.azure.com/"
-
-from azure.ai.textanalytics import TextAnalyticsClient
-from azure.core.credentials import AzureKeyCredential
 
 def get_file_paths(folder_path):
     # Get a list of all files in the specified folder
@@ -23,6 +28,11 @@ def get_text(filepath):
     for i in range(no_of_pages):
         page = reader.pages[i]
         content_info.append(page.extract_text().lower())
+
+    if content_info ==[''] :
+        content_info.clear()
+        content_info.append('Not able to extract')
+       
     
     return content_info
 
@@ -74,22 +84,40 @@ def get_email_id(filepath: str) -> str:
 # This example requires environment variables named "LANGUAGE_KEY" and "LANGUAGE_ENDPOINT"
 
 
+def sample_extractive_summarization(client,document):
 
 
-def sample_abstractive_summarization(document) :
 
-    text_analytics_client = TextAnalyticsClient(
-        endpoint=endpoint,
-        credential=AzureKeyCredential(key),
+    poller = client.begin_analyze_actions(
+        document,
+        actions=[
+            ExtractiveSummaryAction(max_sentence_count=20)
+        ],
     )
-    poller = text_analytics_client.begin_abstract_summary(document)
-    abstract_summary_results = poller.result()
-    result_summary=[]
-    for result in abstract_summary_results:
-        if result.kind == "AbstractiveSummarization":
-            for summary in result.summaries:
-                result_summary.append(summary.text)
+
+    document_results = poller.result()
+    for result in document_results:
+        extract_summary_result = result[0]  # first document, first result
+        if extract_summary_result.is_error:
+            print("...Is an error with code '{}' and message '{}'".format(
+                extract_summary_result.code, extract_summary_result.message
+            ))
+        else:
+            print("Summary extracted: \n{}".format(
+                " ".join([sentence.text for sentence in extract_summary_result.sentences]))
+            )
+
+    return [sentence.text for sentence in extract_summary_result.sentences]
 
 
+def get_skills(filepath):
+    data = ResumeParser(filepath).get_extracted_data()
+    return data['skills']
 
-    return result_summary
+
+def authenticate_client():
+    ta_credential = AzureKeyCredential(key)
+    text_analytics_client = TextAnalyticsClient(
+            endpoint=endpoint, 
+            credential=ta_credential)
+    return text_analytics_client
