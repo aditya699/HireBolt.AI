@@ -5,6 +5,10 @@ import os
 from PyPDF2 import PdfReader
 from pyresparser import ResumeParser
 import warnings
+import logging
+
+# Configure logging to write to a text file
+logging.basicConfig(filename='error_log.txt', level=logging.ERROR)
 
 from azure.core.credentials import AzureKeyCredential
 from azure.ai.textanalytics import (
