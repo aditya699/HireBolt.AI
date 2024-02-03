@@ -3,7 +3,6 @@ import PyPDF2
 import re
 import os
 from PyPDF2 import PdfReader
-from pyresparser import ResumeParser
 import warnings
 
 from azure.core.credentials import AzureKeyCredential
@@ -121,14 +120,7 @@ def sample_extractive_summarization(client, document):
         logging.error(f"Error in sample_extractive_summarization: {e}")
         return ['Error in extractive summarization']
 
-# Get skills using pyresparser
-def get_skills(filepath):
-    try:
-        data = ResumeParser(filepath).get_extracted_data()
-        return data['skills']
-    except Exception as e:
-        logging.error(f"Error in get_skills: {e}")
-        return ['Error in extracting skills']
+
 
 # Authenticate Azure Text Analytics client
 def authenticate_client():

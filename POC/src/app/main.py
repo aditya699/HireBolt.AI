@@ -5,7 +5,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 import pandas as pd
-from functions import get_phone_number, get_email_id, sample_extractive_summarization, get_text, get_file_paths,get_skills,authenticate_client
+from functions import get_phone_number, get_email_id, sample_extractive_summarization, get_text, get_file_paths,authenticate_client
 import logging
 
 client=authenticate_client()
@@ -47,8 +47,7 @@ def main():
                 email_id = get_email_id(filepath)
                 text = get_text(filepath)
                 summary = sample_extractive_summarization(client,document=text)
-                skills=get_skills(filepath)
-                a = a.append({'phone_number': [phone_number], 'email_id': [email_id], 'summary': [summary],'file_paths':[filepath],'skills':[skills]}, ignore_index=True)
+                a = a.append({'phone_number': [phone_number], 'email_id': [email_id], 'summary': [summary],'file_paths':[filepath]}, ignore_index=True)
                 z=z.append({'text_extracor':[text],'file_path':[filepath]}, ignore_index=True)
 
             z.to_csv("full_extractor.csv")
