@@ -22,7 +22,7 @@ def calculate_similarity(query_vector, document_matrix):
 
 # Streamlit UI
 def main():
-    st.title("HireBolt.AI")
+    st.title("Hire4Bharat.AI")
 
     try:
 
@@ -81,7 +81,7 @@ def main():
             st.dataframe(df_sorted.head(no_of_candidates))
 
     except Exception as e:
-        st.success("There is some issue in the application Contact the owner for the same",e)
+        st.success("There is some issue in the application Contact the owner for the same")
         return None
 
 if __name__ == "__main__":
