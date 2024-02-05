@@ -56,16 +56,16 @@ def get_phone_number(filepath: str) -> str:
             page = reader.pages[i]
             content_info.append(page.extract_text())
 
-        # Modified regex pattern to allow spaces in the phone number
-        pattern = r"\+91\s?\d\s?\d{9}|\+91-\d{10}|\d{10}|\(\+91\)\s?\d{3}\s?\d{3}\s?\d{4}"
-        
-        # Using findall to get all matches in the content
-        results = re.findall(pattern, content_info[i])
-        
-        # Check if there are any matches
-        if results:
-            for match in results:
-                return match
+            # Modified regex pattern to allow spaces in the phone number
+            pattern = r"\+91\s?\d\s?\d{9}|\+91-\d{10}|\d{10}|\(\+91\)\s?\d{3}\s?\d{3}\s?\d{4}"
+            
+            # Using findall to get all matches in the content
+            results = re.findall(pattern, content_info[i])
+            
+            # Check if there are any matches
+            if results:
+                for match in results:
+                    return match
     except Exception as e:
         logging.error(f"Error in get_phone_number: {e}")
         return 'Error in extracting phone number'
@@ -81,16 +81,16 @@ def get_email_id(filepath: str) -> str:
             page = reader.pages[i]
             content_info.append(page.extract_text())
 
-        # Modified regex pattern to allow spaces in the email address
-        pattern = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
-        
-        # Using findall to get all matches in the content
-        results = re.findall(pattern, content_info[i])
-        
-        # Check if there are any matches
-        if results:
-            for match in results:
-                return match
+            # Modified regex pattern to allow spaces in the email address
+            pattern = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+            
+            # Using findall to get all matches in the content
+            results = re.findall(pattern, content_info[i])
+            
+            # Check if there are any matches
+            if results:
+                for match in results:
+                    return match
     except Exception as e:
         logging.error(f"Error in get_email_id: {e}")
         return 'Error in extracting email ID'

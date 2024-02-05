@@ -7,10 +7,12 @@ import numpy as np
 import pandas as pd
 from functions import get_phone_number, get_email_id, sample_extractive_summarization, get_text, get_file_paths,authenticate_client
 import logging
-
+import nltk
+from nltk.corpus import stopwords
 client=authenticate_client()
 # Function to clean text
 def clean_text(text):
+    
     text = text.lower()
     text = re.sub(r'[^a-z\s]', '', text)
     return text
@@ -80,7 +82,7 @@ def main():
             st.dataframe(df_sorted.head(no_of_candidates))
 
     except Exception as e:
-        st.success("There is some issue in the application Contact the owner for the same")
+        st.success("There is some issue in the application Contact the owner for the same",e)
         return None
 
 if __name__ == "__main__":
