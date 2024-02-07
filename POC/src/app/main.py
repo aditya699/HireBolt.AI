@@ -15,6 +15,7 @@ def clean_text(text):
     
     text = text.lower()
     text = re.sub(r'[^a-z\s]', '', text)
+
     return text
 
 # Function to calculate cosine similarity
@@ -48,9 +49,12 @@ def main():
                 phone_number = get_phone_number(filepath)
                 email_id = get_email_id(filepath)
                 text = get_text(filepath)
+                cleaned_text = re.sub(r'\s+', ' ', text[0])  # Replace multiple spaces with a single space
+                cleaned_text = re.sub(r'\n', ' ', cleaned_text)  # Remove newline characters
+                cleaned_text = re.sub(r'\s{2,}', ' ', cleaned_text)  # Remove extra spaces    
                 summary = sample_extractive_summarization(client,document=text)
                 a = a.append({'phone_number': [phone_number], 'email_id': [email_id], 'summary': [summary],'file_paths':[filepath]}, ignore_index=True)
-                z=z.append({'text_extracor':[text],'file_path':[filepath]}, ignore_index=True)
+                z=z.append({'text_extracor':[cleaned_text],'file_path':[filepath]}, ignore_index=True)
 
             z.to_csv("full_extractor.csv")
             a.to_csv("Candidates.csv")
